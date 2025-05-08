@@ -1,3 +1,19 @@
+# 🚀 React Coinbase Landing Page – Full Deployment Guide
+
+This project is a fully responsive landing page inspired by Coinbase, built using **React**. This guide walks you through local development, Dockerization, and end-to-end deployment to AWS using **ECS Fargate**, **Terraform**, **ACM**, **ALB**, and **Route 53**.
+
+---
+
+## 🧱 Project Structure
+
+
+
+
+
+
+
+
+
 # Getting Started with Create React App
 
 This project was bootstrapped with [Create React App](https://github.com/facebook/create-react-app).
