@@ -9,59 +9,59 @@ import {
 export default function Roadmap() {
   const data = [
     {
-      date: "July 2012",
+      date: "May 2025",
       name: "Google",
       description:
-        "Let's say you invested $1,000 right before the 2008 crash and left your money there. Price for Vanguard 500 Index Fund Admiral Shares $143 (VFIAX), highest ever. Dropped to $68 in 2009. Current price $430.52.",
+        "Let's say you invested $1,000 right before the 2008 crash and left your money there. Price for Vanguard 500 Index Fund Admiral Shares $143 (VFIAX), highest ever. Dropped to $68 in 2023. Current price $430.52.",
       icon: <RiGoogleFill />,
     },
     {
-      date: "July 2014",
+      date: "July 2025",
       name: "Apple",
       description:
         "Assume you invested $1,000 in Apple, the stock price has never been higher at this point in time at $9.05. Current price $173.07.",
       icon: <RiAppleFill />,
     },
     {
-      date: "July 2018",
+      date: "July 2025",
       name: "Amazon",
       description:
         "Assume you invested $1,000 in a Tech Vanguard ETF at a $52 cost (VITAX). Current price $221.94",
       icon: <RiAmazonFill />,
     },
     {
-      date: "July 2022",
+      date: "May 2025",
       name: "Bitcoin",
       description:
-        "Assume you invested $1,000 in Bitcoin. Price for one Bitcoin was $17,098, later it dropped to $3,500 per Bitcoin before bouncing to over $60,000 in 2021. Current price over $42,629.",
+        "Assume you invested $1,000 in Bitcoin. Price for one Bitcoin was $17,098, later it dropped to $3,500 per Bitcoin before bouncing to over $101,523 in 2025. Current price over $42,629.",
       icon: <RiBitCoinFill />,
     },
     {
-      date: "July 2012",
+      date: "May 2025",
       name: "Google",
       description:
-        "Let's say you invested $1,000 right before the 2008 crash and left your money there. Price for Vanguard 500 Index Fund Admiral Shares $143 (VFIAX), highest ever. Dropped to $68 in 2009. Current price $430.52.",
+        "Let's say you invested $1,000 right before the 2008 crash and left your money there. Price for Vanguard 500 Index Fund Admiral Shares $143 (VFIAX), highest ever. Dropped to $68 in 2009. Current price $153.79.",
       icon: <RiGoogleFill />,
     },
     {
-      date: "July 2014",
+      date: "July 2025",
       name: "Apple",
       description:
-        "Assume you invested $1,000 in Apple, the stock price has never been higher at this point in time at $9.05. Current price $173.07.",
+        "Assume you invested $1,000 in Apple, the stock price has never been higher at this point in time at $9.05. Current price $197.55.",
       icon: <RiAppleFill />,
     },
     {
-      date: "July 2018",
+      date: "May 2025",
       name: "Amazon",
       description:
-        "Assume you invested $1,000 in a Tech Vanguard ETF at a $52 cost (VITAX). Current price $221.94",
+        "Assume you invested $1,000 in a Tech Vanguard ETF at a $52 cost (VITAX). Current price $192.00",
       icon: <RiAmazonFill />,
     },
     {
-      date: "July 2022",
-      name: "Bitcoin",
+      date: "May 2025",
+      name: "BNB",
       description:
-        "Assume you invested $1,000 in Bitcoin. Price for one Bitcoin was $17,098, later it dropped to $3,500 per Bitcoin before bouncing to over $60,000 in 2021. Current price over $42,629.",
+        "Assume you invested $1,000 in BNB. Price for one Bitcoin was $700,000, later it dropped to $300,00 per BNB before bouncing to over $621,66 in 2025. Current price over $621,97.",
       icon: <RiBitCoinFill />,
     },
   ];
