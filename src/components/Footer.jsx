@@ -39,8 +39,8 @@ export default function Footer() {
             <p>GymVast, 18 East 50th Street, 4th Floor, New York, NY 10022</p>
           </div>
           <div className="info">
-            <span>T : +1-202-555-0184</span>
-            <span>E : hello@cryptoz.com</span>
+            <span>T : +447787215455</span>
+            <span>E : alongemiracle333@gmail.com</span>
           </div>
           <div className="social-icons flex gap-2">
             {socialIcons.map((icon, index) => {
@@ -90,7 +90,7 @@ export default function Footer() {
       </div>
       <div className="lower-footer flex a-center j-between gap">
         <div className="col1">
-          <span>&copy; Crypto a Theme by Kishan Sheth</span>
+          <span>&copy; Crypto a Theme by Osenat Alonge</span>
         </div>
         <div className="col2 flex a-center gap">
           <span>Privacy Policy</span>
