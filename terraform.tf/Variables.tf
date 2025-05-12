@@ -1,5 +1,5 @@
 variable "domain_name" {
-  default = "etaoko.com"
+  default = "eta-oko.com"
 }
 
 variable "subdomain" {
