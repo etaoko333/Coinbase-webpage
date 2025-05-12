@@ -7,37 +7,49 @@ on:
 
 jobs:
   deploy:
-    name: Build Docker Image and Deploy to ECS
+    name: Build and Deploy to ECS
     runs-on: ubuntu-latest
+    environment: production
 
     steps:
+      # Checkout code
       - name: Checkout code
-        uses: actions/checkout@v3
+        uses: actions/checkout@v4
 
+      # Configure AWS credentials
       - name: Configure AWS credentials
-        uses: aws-actions/configure-aws-credentials@v2
+        uses: aws-actions/configure-aws-credentials@v4
         with:
           aws-access-key-id: ${{ secrets.AWS_ACCESS_KEY_ID }}
           aws-secret-access-key: ${{ secrets.AWS_SECRET_ACCESS_KEY }}
           aws-region: us-west-1
 
+      # Login to ECR
       - name: Login to Amazon ECR
-        run: |
-          aws ecr get-login-password --region us-west-1 | docker login --username AWS --password-stdin 851725512876.dkr.ecr.us-west-1.amazonaws.com
+        uses: aws-actions/amazon-ecr-login@v2
 
+      # Build, tag, and push Docker image
       - name: Build Docker image
         run: docker build -t coinbase-app .
 
-      - name: Tag Docker image for ECR
-        run: docker tag coinbase-app:latest 851725512876.dkr.ecr.us-west-1.amazonaws.com/coinbase-app:latest
+      - name: Tag Docker image
+        run: |
+          docker tag coinbase-app:latest 851725512876.dkr.ecr.us-west-1.amazonaws.com/coinbase-app:latest
+          docker tag coinbase-app:latest 851725512876.dkr.ecr.us-west-1.amazonaws.com/coinbase-app:${{ github.sha }}
 
-      - name: Push Docker image to ECR
-        run: docker push 851725512876.dkr.ecr.us-west-1.amazonaws.com/coinbase-app:latest
+      - name: Push Docker image
+        run: |
+          docker push 851725512876.dkr.ecr.us-west-1.amazonaws.com/coinbase-app:latest
+          docker push 851725512876.dkr.ecr.us-west-1.amazonaws.com/coinbase-app:${{ github.sha }}
 
-      - name: Deploy to Amazon ECS
-        uses: aws-actions/amazon-ecs-deploy-task-definition@v1
-        with:
-          task-definition: ecs-task-definition.json
-          service: my-react-service
-          cluster: react-app-cluster
-          wait-for-service-stability: true
+      # Set up Terraform
+      - name: Set up Terraform
+        uses: hashicorp/setup-terraform@v2
+
+      # Initialize Terraform
+      - name: Terraform Init
+        run: terraform -chdir=terraform.tf init
+
+      # Apply Terraform with the new image tag
+      - name: Terraform Apply
+        run: terraform -chdir=terraform.tf apply -auto-approve -var="app_image=851725512876.dkr.ecr.us-west-1.amazonaws.com/coinbase-app:${{ github.sha }}"
