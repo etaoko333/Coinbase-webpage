@@ -1,0 +1,19 @@
+{
+  "family": "coinbase-app",
+  "networkMode": "awsvpc",
+  "containerDefinitions": [
+    {
+      "name": "coinbase-app",
+      "image": "851725512876.dkr.ecr.us-west-1.amazonaws.com/coinbase-app:latest",
+      "cpu": 256,
+      "memory": 512,
+      "essential": true,
+      "portMappings": [
+        {
+          "containerPort": 80,
+          "hostPort": 80
+        }
+      ]
+    }
+  ]
+}
