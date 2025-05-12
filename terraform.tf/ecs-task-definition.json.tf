@@ -1,4 +1,4 @@
-resource "aws_ecs_task_definition" "app" {
+resource "aws_ecs_task_definition" "project" {
   family                   = "react-task"
   requires_compatibilities = ["FARGATE"]
   network_mode             = "awsvpc"
