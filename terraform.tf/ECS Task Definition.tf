@@ -9,7 +9,7 @@ resource "aws_ecs_task_definition" "app" {
   container_definitions = jsonencode([
     {
       name      = "react-app",
-      image     = "<YOUR_ECR_REPO_URL>:latest",
+      image     = "851725512876.dkr.ecr.us-west-1.amazonaws.com/coinbase-app:latest",
       portMappings = [
         {
           containerPort = 80
