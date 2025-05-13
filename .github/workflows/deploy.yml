@@ -28,34 +28,53 @@ jobs:
           aws-secret-access-key: ${{ secrets.AWS_SECRET_ACCESS_KEY }}
           aws-region: ${{ env.AWS_REGION }}
 
-      
-      - name: Login to Amazon 
-        id:   login-ecr
+      # Create ECS cluster if not exists
+      - name: Ensure ECS Cluster exists
+        run: |
+          aws ecs create-cluster \
+            --cluster-name ${{ env.CLUSTER_NAME }} \
+            --region ${{ env.AWS_REGION }} \
+            --settings name=containerInsights,value=enabled || \
+          echo "Cluster exists or creation failed"
+
+      # Verify or create ECS service with proper error handling
+      - name: Ensure ECS Service exists
+        run: |
+          if ! aws ecs describe-services \
+            --cluster ${{ env.CLUSTER_NAME }} \
+            --services ${{ env.SERVICE_NAME }} \
+            --region ${{ env.AWS_REGION }} \
+            --query 'services[0].status' \
+            --output text | grep -q 'ACTIVE'; then
+            
+            echo "Service does not exist, creating..."
+            aws ecs create-service \
+              --cluster ${{ env.CLUSTER_NAME }} \
+              --service-name ${{ env.SERVICE_NAME }} \
+              --task-definition $(jq -r '.family' ecs-task-definition.json) \
+              --launch-type FARGATE \
+              --desired-count 1 \
+              --network-configuration "awsvpcConfiguration={subnets=[${{ secrets.SUBNET_IDS }}],securityGroups=[${{ secrets.SECURITY_GROUP_ID }}],assignPublicIp=ENABLED}" \
+              --region ${{ env.AWS_REGION }}
+            
+            aws ecs wait services-stable \
+              --cluster ${{ env.CLUSTER_NAME }} \
+              --services ${{ env.SERVICE_NAME }} \
+              --region ${{ env.AWS_REGION }}
+          else
+            echo "Service already exists"
+          fi
+
+      - name: Login to Amazon ECR
         uses: aws-actions/amazon-ecr-login@v2
 
-      - name: Build, tag and push Docker 
-        id: build-image
-        env:
-          ECR_REGISTRY: "***.dkr.ecr.us-east-2.amazonaws.com"
-          ECR_REPOSITORY: "coinbase_app"
-          IMAGE_TAG: latest
-
+      - name: Build, tag and push Docker image
         run: |
           docker build -t coinbase-app .
           docker tag coinbase-app:latest ${{ env.ECR_REPOSITORY }}:latest
           docker tag coinbase-app:latest ${{ env.ECR_REPOSITORY }}:${{ github.sha }}
           docker push ${{ env.ECR_REPOSITORY }}:latest
           docker push ${{ env.ECR_REPOSITORY }}:${{ github.sha }}
-          echo "::set-output name=image::$ECR_REGISTRY/$ECR_REPOSITORY:$IMAGE_TAG"
-
-
-      - name: Fill in the new image ID in the Amazon ECS task definition
-        id: task-def-1
-        uses: aws-actions/amazon-ecs-render-task-definition@v1
-        with:
-          task-definition: ${{ env.ECS_TD }}
-          container-name: ${{ env.CONTAINER_NAME }}
-          image: ${{ steps.build-image.outputs.image }}
 
       - name: Deploy to Amazon ECS
         uses: aws-actions/amazon-ecs-deploy-task-definition@v2
@@ -64,3 +83,4 @@ jobs:
           service: ${{ env.SERVICE_NAME }}
           cluster: ${{ env.CLUSTER_NAME }}
           wait-for-service-stability: true
+          force-new-deployment: true
