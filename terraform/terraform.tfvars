@@ -1,0 +1,1 @@
+ecr_repository_url = "851725512876.dkr.ecr.us-west-1.amazonaws.com/coinbase-app"

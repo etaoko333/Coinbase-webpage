@@ -5,6 +5,12 @@ on:
     branches:
       - main
 
+env:
+  AWS_REGION: us-west-1
+  ECR_REPOSITORY: 851725512876.dkr.ecr.us-west-1.amazonaws.com/coinbase-app
+  CLUSTER_NAME: react-app-cluster
+  SERVICE_NAME: my-react-service
+
 jobs:
   deploy:
     name: Build and Deploy to ECS
@@ -20,29 +26,41 @@ jobs:
         with:
           aws-access-key-id: ${{ secrets.AWS_ACCESS_KEY_ID }}
           aws-secret-access-key: ${{ secrets.AWS_SECRET_ACCESS_KEY }}
-          aws-region: us-west-1
+          aws-region: ${{ env.AWS_REGION }}
 
-      - name: Login to Amazon ECR
-        id: login-ecr
+      
+      - name: Login to Amazon 
+        id:   login-ecr
         uses: aws-actions/amazon-ecr-login@v2
 
-      - name: Build Docker image
-        run: docker build -t coinbase-app .
+      - name: Build, tag and push Docker 
+        id: build-image
+        env:
+          ECR_REGISTRY: "***.dkr.ecr.us-east-2.amazonaws.com"
+          ECR_REPOSITORY: "coinbase_app"
+          IMAGE_TAG: latest
 
-      - name: Tag Docker image
         run: |
-          docker tag coinbase-app:latest 851725512876.dkr.ecr.us-west-1.amazonaws.com/coinbase-app:latest
-          docker tag coinbase-app:latest 851725512876.dkr.ecr.us-west-1.amazonaws.com/coinbase-app:${{ github.sha }}
+          docker build -t coinbase-app .
+          docker tag coinbase-app:latest ${{ env.ECR_REPOSITORY }}:latest
+          docker tag coinbase-app:latest ${{ env.ECR_REPOSITORY }}:${{ github.sha }}
+          docker push ${{ env.ECR_REPOSITORY }}:latest
+          docker push ${{ env.ECR_REPOSITORY }}:${{ github.sha }}
+          echo "::set-output name=image::$ECR_REGISTRY/$ECR_REPOSITORY:$IMAGE_TAG"
 
-      - name: Push Docker image
-        run: |
-          docker push 851725512876.dkr.ecr.us-west-1.amazonaws.com/coinbase-app:latest
-          docker push 851725512876.dkr.ecr.us-west-1.amazonaws.com/coinbase-app:${{ github.sha }}
+
+      - name: Fill in the new image ID in the Amazon ECS task definition
+        id: task-def-1
+        uses: aws-actions/amazon-ecs-render-task-definition@v1
+        with:
+          task-definition: ${{ env.ECS_TD }}
+          container-name: ${{ env.CONTAINER_NAME }}
+          image: ${{ steps.build-image.outputs.image }}
 
       - name: Deploy to Amazon ECS
-        uses: aws-actions/amazon-ecs-deploy-task-definition@v1
+        uses: aws-actions/amazon-ecs-deploy-task-definition@v2
         with:
           task-definition: ecs-task-definition.json
-          service: my-react-service
-          cluster: react-app-cluster
+          service: ${{ env.SERVICE_NAME }}
+          cluster: ${{ env.CLUSTER_NAME }}
           wait-for-service-stability: true
