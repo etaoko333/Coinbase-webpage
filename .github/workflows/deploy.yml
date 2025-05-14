@@ -5,12 +5,6 @@ on:
     branches:
       - main
 
-env:
-  AWS_REGION: us-west-1
-  ECR_REPOSITORY: 851725512876.dkr.ecr.us-west-1.amazonaws.com/coinbase-app
-  CLUSTER_NAME: react-app-cluster
-  SERVICE_NAME: my-react-service
-
 jobs:
   deploy:
     name: Build and Deploy to ECS
@@ -26,61 +20,25 @@ jobs:
         with:
           aws-access-key-id: ${{ secrets.AWS_ACCESS_KEY_ID }}
           aws-secret-access-key: ${{ secrets.AWS_SECRET_ACCESS_KEY }}
-          aws-region: ${{ env.AWS_REGION }}
-
-      # Create ECS cluster if not exists
-      - name: Ensure ECS Cluster exists
-        run: |
-          aws ecs create-cluster \
-            --cluster-name ${{ env.CLUSTER_NAME }} \
-            --region ${{ env.AWS_REGION }} \
-            --settings name=containerInsights,value=enabled || \
-          echo "Cluster exists or creation failed"
-
-      # Verify or create ECS service with proper error handling
-      - name: Ensure ECS Service exists
-        run: |
-          if ! aws ecs describe-services \
-            --cluster ${{ env.CLUSTER_NAME }} \
-            --services ${{ env.SERVICE_NAME }} \
-            --region ${{ env.AWS_REGION }} \
-            --query 'services[0].status' \
-            --output text | grep -q 'ACTIVE'; then
-            
-            echo "Service does not exist, creating..."
-            aws ecs create-service \
-              --cluster ${{ env.CLUSTER_NAME }} \
-              --service-name ${{ env.SERVICE_NAME }} \
-              --task-definition $(jq -r '.family' ecs-task-definition.json) \
-              --launch-type FARGATE \
-              --desired-count 1 \
-              --network-configuration "awsvpcConfiguration={subnets=[${{ secrets.SUBNET_IDS }}],securityGroups=[${{ secrets.SECURITY_GROUP_ID }}],assignPublicIp=ENABLED}" \
-              --region ${{ env.AWS_REGION }}
-            
-            aws ecs wait services-stable \
-              --cluster ${{ env.CLUSTER_NAME }} \
-              --services ${{ env.SERVICE_NAME }} \
-              --region ${{ env.AWS_REGION }}
-          else
-            echo "Service already exists"
-          fi
+          aws-region: ${{ secrets.AWS_REGION }}
 
       - name: Login to Amazon ECR
         uses: aws-actions/amazon-ecr-login@v2
 
-      - name: Build, tag and push Docker image
+      - name: Build, Tag, and Push Docker image
         run: |
-          docker build -t coinbase-app .
-          docker tag coinbase-app:latest ${{ env.ECR_REPOSITORY }}:latest
-          docker tag coinbase-app:latest ${{ env.ECR_REPOSITORY }}:${{ github.sha }}
-          docker push ${{ env.ECR_REPOSITORY }}:latest
-          docker push ${{ env.ECR_REPOSITORY }}:${{ github.sha }}
+          IMAGE_TAG=${{ github.sha }}
+          docker build -t react-app .
+          docker tag react-app:latest ${{ secrets.ECR_REPOSITORY }}:latest
+          docker tag react-app:latest ${{ secrets.ECR_REPOSITORY }}:$IMAGE_TAG
+          docker push ${{ secrets.ECR_REPOSITORY }}:latest
+          docker push ${{ secrets.ECR_REPOSITORY }}:$IMAGE_TAG
 
       - name: Deploy to Amazon ECS
         uses: aws-actions/amazon-ecs-deploy-task-definition@v2
         with:
-          task-definition: ecs-task-definition.json
-          service: ${{ env.SERVICE_NAME }}
-          cluster: ${{ env.CLUSTER_NAME }}
+          task-definition: ${{ secrets.ECS_TASK_DEFINITION }}
+          service: ${{ secrets.ECS_SERVICE_NAME }}
+          cluster: ${{ secrets.ECS_CLUSTER_NAME }}
           wait-for-service-stability: true
           force-new-deployment: true
