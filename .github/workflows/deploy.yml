@@ -9,7 +9,7 @@ env:
   AWS_REGION: us-west-1
   ECR_REPOSITORY: react-app  # Just the repo name, not full URI
   CLUSTER_NAME: react-app-cluster
-  SERVICE_NAME: my-react-service
+  SERVICE_NAME: react-app-service
 
 jobs:
   deploy:
