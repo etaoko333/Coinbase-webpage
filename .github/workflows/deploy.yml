@@ -7,7 +7,7 @@ on:
 
 env:
   AWS_REGION: us-west-1
-  ECR_REPOSITORY: 851725512876.dkr.ecr.us-west-1.amazonaws.com/react-app
+  ECR_REPOSITORY: react-app  # Just the repo name, not full URI
   CLUSTER_NAME: react-app-cluster
   SERVICE_NAME: my-react-service
 
@@ -28,24 +28,25 @@ jobs:
           aws-secret-access-key: ${{ secrets.AWS_SECRET_ACCESS_KEY }}
           aws-region: ${{ env.AWS_REGION }}
 
-      - name: Login to Amazon ECR manually
+      - name: Login to Amazon ECR
+        id: login-ecr
         run: |
-          aws ecr get-login-password --region ${{ secrets.AWS_REGION }} | \
-          docker login --username AWS --password-stdin ${{ secrets.AWS_ACCOUNT_ID }}.dkr.ecr.${{ secrets.AWS_REGION }}.amazonaws.com
+          aws ecr get-login-password --region ${{ env.AWS_REGION }} | \
+          docker login --username AWS --password-stdin ${{ secrets.AWS_ACCOUNT_ID }}.dkr.ecr.${{ env.AWS_REGION }}.amazonaws.com
 
       - name: Build, Tag, and Push Docker image
         run: |
           IMAGE_TAG=${{ github.sha }}
-          docker build -t react-app .
-          docker tag react-app:latest ${{ secrets.ECR_REPOSITORY }}:latest
-          docker tag react-app:latest ${{ secrets.ECR_REPOSITORY }}:$IMAGE_TAG
-          docker push ${{ secrets.ECR_REPOSITORY }}:latest
-          docker push ${{ secrets.ECR_REPOSITORY }}:$IMAGE_TAG
+          ECR_REGISTRY=${{ secrets.AWS_ACCOUNT_ID }}.dkr.ecr.${{ env.AWS_REGION }}.amazonaws.com
+          docker build -t $ECR_REGISTRY/${{ env.ECR_REPOSITORY }}:$IMAGE_TAG .
+          docker tag $ECR_REGISTRY/${{ env.ECR_REPOSITORY }}:$IMAGE_TAG $ECR_REGISTRY/${{ env.ECR_REPOSITORY }}:latest
+          docker push $ECR_REGISTRY/${{ env.ECR_REPOSITORY }}:$IMAGE_TAG
+          docker push $ECR_REGISTRY/${{ env.ECR_REPOSITORY }}:latest
 
       - name: Deploy to Amazon ECS
         uses: aws-actions/amazon-ecs-deploy-task-definition@v2
         with:
-          task-definition: ecs-task-definition.json
+          task-definition: ecs-task-definition.json  # Make sure this file exists in your repo
           service: ${{ env.SERVICE_NAME }}
           cluster: ${{ env.CLUSTER_NAME }}
           wait-for-service-stability: true
