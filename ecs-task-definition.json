@@ -1,5 +1,5 @@
 {
-  "family": "coinbase-app",
+  "family": "react-app",
   "networkMode": "awsvpc",
   "requiresCompatibilities": ["FARGATE"],
   "cpu": "256",
