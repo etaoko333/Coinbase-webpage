@@ -2,6 +2,10 @@
 
 
 
+
+![2025-05-14 (3)](https://github.com/user-attachments/assets/c0104287-867d-48f7-a78f-f80483f40fe8)
+
+
 ![2025-05-14 (18)](https://github.com/user-attachments/assets/1a6470ac-bd6b-4f09-b7c7-8a7cf344eeb7)
 
 This hands-on guide will walk you through building and deploying a modern, responsive Coinbase-style landing page using **React**. You’ll containerize the app with **Docker**, manage infrastructure with **Terraform**, automate deployment using **GitHub Actions**, and host it on **AWS ECS Fargate** with secure HTTPS access via **ACM** and **Route 53**.
