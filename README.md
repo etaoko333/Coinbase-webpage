@@ -241,6 +241,6 @@ Visit `https://www.eta-oko.com` to view your fully deployed, containerized, and 
 Star the repo ✨, share it with your network, or fork it to build your own SaaS landing page.
 
 **Medium Blog:** [[https://medium.com/@osenat.alonge/deploying-a-react-coinbase-landing-page-to-aws-a-complete-guide-with-terraform-ecs-fargate-c249ce88204f](https://www.eta-oko.com](https://medium.com/@osenat.alonge/deploying-a-react-coinbase-landing-page-to-aws-a-complete-guide-with-terraform-ecs-fargate-c249ce88204f))
-**GitHub Repo:** [github.com/your-username/react-coinbase-landing](https://github.com/your-username/react-coinbase-landing)
+**GitHub Repo:** [[github.com/your-username/react-coinbase-landing](https://github.com/etaoko333/Coinbase-webpage.git)]([https://github.com/your-username/react-coinbase-landing](https://github.com/etaoko333/Coinbase-webpage.git))
 
 Thanks for reading — now go deploy something awesome!
